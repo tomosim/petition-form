@@ -1,6 +1,6 @@
 'use client'
 import { type } from "os";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 
 export default function Form() {
@@ -10,6 +10,13 @@ export default function Form() {
     const [consent, setConsent] = useState(false);
 
     const [errors, setErrors] = useState<{ [key in "name" | "email" | "consent"]: string }>({ name: "", email: "", consent: "" });
+
+    useEffect(() => {
+        const firstInvalidField = (['name', 'email', 'consent'] as const).find((field) => errors[field]);
+        if (firstInvalidField) {
+            document.getElementById(firstInvalidField)?.focus();
+        }
+    }, [errors]);
 
     const SignPetitionSchema = z.object({
         name: z.string().nonempty("Name is required"),
@@ -42,9 +49,13 @@ export default function Form() {
                 email: treeifiedError.properties?.email?.errors[0] || "",
                 consent: treeifiedError.properties?.consent?.errors[0] || "",
             });
+
+
         }
-        setErrors({ name: "", email: "", consent: "" });
-        //send form data
+        else {
+            setErrors({ name: "", email: "", consent: "" });
+            //send form data
+        }
     };
 
     return (
