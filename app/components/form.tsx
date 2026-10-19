@@ -1,7 +1,7 @@
 'use client'
-import { type } from "os";
 import { useEffect, useState } from "react";
 import { z } from "zod";
+import styles from "./form.module.css";
 
 export default function Form() {
     const [name, setName] = useState("");
@@ -73,7 +73,7 @@ export default function Form() {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className={styles.form}>
             {errors.name && <p style={{ color: "red" }}>{errors.name}</p>}
             <label htmlFor="name">Name:</label>
             <input type="text" id="name" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} />
