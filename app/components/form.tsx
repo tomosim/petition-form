@@ -29,7 +29,7 @@ export default function Form() {
 
     type SignPetitionInput = z.infer<typeof SignPetitionSchema>;
 
-    const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         const formData: SignPetitionInput = {
@@ -54,7 +54,21 @@ export default function Form() {
         }
         else {
             setErrors({ name: "", email: "", consent: "" });
-            //send form data
+            try {
+                const response = await fetch("/api/sign-petition", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(formData),
+                })
+                const data = await response.json();
+                console.log("Success:", data);
+                // Optionally, you can reset the form or show a success message here
+            } catch (error) {
+                console.error("Error:", error);
+                // Optionally, you can show an error message here
+            };
         }
     };
 
