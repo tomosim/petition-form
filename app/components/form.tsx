@@ -3,11 +3,12 @@ import { useEffect, useState } from "react";
 import { z } from "zod";
 import styles from "./form.module.css";
 
-export default function Form() {
+export default function Form({ increaseCount }: { increaseCount: () => void }) {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [comment, setComment] = useState("");
     const [consent, setConsent] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const [errors, setErrors] = useState<{ [key in "name" | "email" | "consent"]: string }>({ name: "", email: "", consent: "" });
 
@@ -53,6 +54,7 @@ export default function Form() {
 
         }
         else {
+            setIsLoading(true);
             setErrors({ name: "", email: "", consent: "" });
             try {
                 const response = await fetch("/api/sign-petition", {
@@ -63,11 +65,17 @@ export default function Form() {
                     body: JSON.stringify(formData),
                 })
                 const data = await response.json();
-                console.log("Success:", data);
-                // Optionally, you can reset the form or show a success message here
+                setIsLoading(false);
+                setName("");
+                setEmail("");
+                setComment("");
+                setConsent(false);
+                alert("Thank you for signing the petition!");
+                increaseCount()
             } catch (error) {
                 console.error("Error:", error);
-                // Optionally, you can show an error message here
+                setIsLoading(false);
+                alert("There was an error signing the petition. Please try again.");
             };
         }
     };
@@ -85,7 +93,9 @@ export default function Form() {
             {errors.consent && <p style={{ color: "red" }}>{errors.consent}</p>}
             <label htmlFor="consent">I agree to have my name counted and to be contacted about this petition.</label>
             <input type="checkbox" id="consent" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
-            <button type="submit">Sign petition</button>
+            <button type="submit" disabled={isLoading}>
+                Sign petition
+            </button>
         </form>
     );
 }
